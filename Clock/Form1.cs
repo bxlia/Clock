@@ -15,13 +15,14 @@ namespace Clock
         public MainForm()
         {
             InitializeComponent();
+            tsmiShowControls.Checked = true;
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void timer_Tick(object sender, EventArgs e)
         {
             labelTime.Text = DateTime.Now.ToString("HH:mm:ss");
             if (cbShowDate.Checked)
-                labelTime.Text += $"\n{DateTime.Now.ToString("yyyy.MM.dd")}";
+                labelTime.Text += $"\n{DateTime.Now:yyyy.MM.dd}";
             if (cbShowWeekday.Checked)
                 labelTime.Text += $"\n{DateTime.Now.DayOfWeek}";
             notifyIcon.Text = labelTime.Text;
@@ -38,22 +39,62 @@ namespace Clock
 
         private void btnHideControls_Click(object sender, EventArgs e)
         {
-            SetVisibility(false);
+            SetVisibility(tsmiShowControls.Checked = false);
         }
 
         private void labelTime_DoubleClick(object sender, EventArgs e)
         {
-            SetVisibility(true);
+            SetVisibility(tsmiShowControls.Checked = true);
         }
 
         private void ShowDate_CheckedChanged(object sender, EventArgs e)
         {
-
+            SetVisibility(false);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            SetVisibility(false);
+        }
 
+        private void tsmiTopmost_CheckedChanged(object sender, EventArgs e)
+        {
+            this.TopMost = tsmiTopmost.Checked;
+        }
+
+        private void tsmiShowControls_CheckedChanged(object sender, EventArgs e)
+        {
+            SetVisibility(tsmiShowControls.Checked);
+        }
+
+        private void tsmiClose_Click(object sender, EventArgs e) => this.Close();
+
+        private void tsmiShowDate_CheckedChanged(object sender, EventArgs e)
+        {
+            cbShowDate.Checked = tsmiShowDate.Checked;
+        }
+        private void cbShowDate_CheckedChanged(object sender, EventArgs e)
+        {
+            tsmiShowDate.Checked = cbShowDate.Checked;
+        }
+
+        private void tsmiShowWeekday_CheckedChanged(object sender, EventArgs e)
+        {
+            cbShowWeekday.Checked = (sender as ToolStripMenuItem).Checked;
+        }
+
+        private void cbShowWeekday_CheckedChanged(object sender, EventArgs e)
+        {
+            tsmiShowDate.Checked = (sender as ToolStripMenuItem).Checked;
+        }
+
+        private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if(!this.TopMost)
+            {
+                this.TopMost = true;
+                this.TopMost = false;
+            }
         }
     }
 }
