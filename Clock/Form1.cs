@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Win32;
+using System.Drawing.Text;
 
 namespace Clock
 {
@@ -14,12 +16,32 @@ namespace Clock
     {
         ColorDialog backgroundColorDialog;
         ColorDialog foregroundColorDialog;
+        PrivateFontCollection privateFonts;
+
         public MainForm()
         {
             InitializeComponent();
             SetVisibility(tsmiShowControls.Checked = false);
             backgroundColorDialog = new ColorDialog();
             foregroundColorDialog = new ColorDialog();
+            // Загрузка кастомного шрифта
+            LoadCustomFont();
+        }
+
+        //Установка шрифта
+        private void LoadCustomFont()
+        {
+                privateFonts = new PrivateFontCollection();
+                string fontPath = Application.StartupPath + "\\DigitalFont.ttf";
+                if (System.IO.File.Exists(fontPath))
+                {
+                    privateFonts.AddFontFile(fontPath);
+                    if (privateFonts.Families.Length > 0)
+                    {
+                        labelTime.Font = new Font(privateFonts.Families[0], 24, FontStyle.Regular);
+                    }
+                }
+            
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -31,6 +53,7 @@ namespace Clock
                 labelTime.Text += $"\n{DateTime.Now.DayOfWeek}";
             notifyIcon.Text = labelTime.Text;
         }
+
         void SetVisibility(bool visible)
         {
             cbShowDate.Visible = visible;
@@ -56,9 +79,23 @@ namespace Clock
             SetVisibility(false);
         }
 
+        //Автонастройка
         private void MainForm_Load(object sender, EventArgs e)
         {
+            SetFormPosition();
+            LoadAutostartSetting();
+
             SetVisibility(false);
+        }
+
+        //Получаем и ставим экран в правый верхний угол
+        private void SetFormPosition()
+        {
+            Screen screen = Screen.PrimaryScreen;
+            this.Location = new Point(
+                screen.WorkingArea.Width - this.Width,
+                0
+            );
         }
 
         private void tsmiTopmost_CheckedChanged(object sender, EventArgs e)
@@ -70,13 +107,13 @@ namespace Clock
         {
             SetVisibility(tsmiShowControls.Checked);
         }
-
         private void tsmiClose_Click(object sender, EventArgs e) => this.Close();
 
         private void tsmiShowDate_CheckedChanged(object sender, EventArgs e)
         {
             cbShowDate.Checked = tsmiShowDate.Checked;
         }
+
         private void cbShowDate_CheckedChanged(object sender, EventArgs e)
         {
             tsmiShowDate.Checked = cbShowDate.Checked;
@@ -89,7 +126,7 @@ namespace Clock
 
         private void cbShowWeekday_CheckedChanged(object sender, EventArgs e)
         {
-            tsmiShowDate.Checked = (sender as ToolStripMenuItem).Checked;
+            tsmiShowWeekday.Checked = (sender as ToolStripMenuItem).Checked;
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -108,11 +145,78 @@ namespace Clock
                 labelTime.BackColor = backgroundColorDialog.Color;
             }
         }
+
         private void tsmiForegroundColor_Click(object sender, EventArgs e)
         {
             if (foregroundColorDialog.ShowDialog(this) == DialogResult.OK)
             {
                 labelTime.ForeColor = foregroundColorDialog.Color;
+            }
+        }
+
+        private void tsmiAutostart_CheckedChanged(object sender, EventArgs e)
+        {
+            SetAutostart(tsmiAutostart.Checked);
+        }
+
+        private void SetAutostart(bool enable)
+        {
+                string appName = "Clock";
+                string appPath = Application.ExecutablePath;
+
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(
+                    @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+                {
+                    if (enable)
+                    {
+                        key.SetValue(appName, appPath);
+                    }
+                    else
+                    {
+                        if (key.GetValue(appName) != null)
+                            key.DeleteValue(appName);
+                    }
+                }
+        }
+
+        private void LoadAutostartSetting()
+        {
+            try
+            {
+                string appName = "Clock";
+
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(
+                    @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", false))
+                {
+                    tsmiAutostart.Checked = key.GetValue(appName) != null;
+                }
+            }
+            catch
+            {
+                tsmiAutostart.Checked = false;
+            }
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            if (this.WindowState == FormWindowState.Normal)
+            {
+                SetFormPosition();
+            }
+        }
+
+        protected override void OnLocationChanged(EventArgs e)
+        {
+            base.OnLocationChanged(e);
+            if (this.WindowState == FormWindowState.Normal)
+            {
+                Screen screen = Screen.FromControl(this);
+                if (this.Left != screen.WorkingArea.Width - this.Width ||
+                    this.Top != 0)
+                {
+                    SetFormPosition();
+                }
             }
         }
     }
