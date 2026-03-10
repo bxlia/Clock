@@ -26,6 +26,7 @@ namespace Clock
             foregroundColorDialog = new ColorDialog();
             // Загрузка кастомного шрифта
             LoadCustomFont();
+            this.Location = new Point(Screen.PrimaryScreen.Bounds.Width - this.Width - 25, 50);
         }
 
         //Установка шрифта
@@ -82,21 +83,12 @@ namespace Clock
         //Автонастройка
         private void MainForm_Load(object sender, EventArgs e)
         {
-            SetFormPosition();
+            //SetFormPosition();
             LoadAutostartSetting();
 
             SetVisibility(false);
         }
 
-        //Получаем и ставим экран в правый верхний угол
-        private void SetFormPosition()
-        {
-            Screen screen = Screen.PrimaryScreen;
-            this.Location = new Point(
-                screen.WorkingArea.Width - this.Width,
-                0
-            );
-        }
 
         private void tsmiTopmost_CheckedChanged(object sender, EventArgs e)
         {
@@ -202,7 +194,7 @@ namespace Clock
             base.OnResize(e);
             if (this.WindowState == FormWindowState.Normal)
             {
-                SetFormPosition();
+                //SetFormPosition();
             }
         }
 
@@ -215,7 +207,7 @@ namespace Clock
                 if (this.Left != screen.WorkingArea.Width - this.Width ||
                     this.Top != 0)
                 {
-                    SetFormPosition();
+                    //SetFormPosition();
                 }
             }
         }
