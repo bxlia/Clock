@@ -223,5 +223,9 @@ namespace Clock
         {
             fontDialog.ShowDialog();
         }
+        private void tsmiFont_Click(object sender, EventArgs e)
+        {
+            if
+        }
     }
 }
