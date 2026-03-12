@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.Win32;
-using System.Drawing.Text;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+using System.Runtime.InteropServices;
 
 namespace Clock
 {
@@ -17,18 +19,23 @@ namespace Clock
         ColorDialog backgroundColorDialog;
         ColorDialog foregroundColorDialog;
         PrivateFontCollection privateFonts;
+        FontDialog fontDialog;
 
         public MainForm()
         {
             InitializeComponent();
+            AllocConsole();
             SetVisibility(tsmiShowControls.Checked = false);
+            this.Location = new Point(Screen.PrimaryScreen.Bounds.Width - this.Width - 25, 50);
             backgroundColorDialog = new ColorDialog();
             foregroundColorDialog = new ColorDialog();
             // Загрузка кастомного шрифта
             LoadCustomFont();
+            fontDialog = new FontDialog(this);
             this.Location = new Point(Screen.PrimaryScreen.Bounds.Width - this.Width - 25, 50);
         }
-
+        [DllImport("kernel32.dll")]
+        public static extern bool AllocConsole();
         //Установка шрифта
         private void LoadCustomFont()
         {
@@ -210,6 +217,11 @@ namespace Clock
                     //SetFormPosition();
                 }
             }
+        }
+
+        private void fontToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            fontDialog.ShowDialog();
         }
     }
 }
