@@ -155,7 +155,11 @@ namespace Clock
 
         private void tsmiAutostart_CheckedChanged(object sender, EventArgs e)
         {
-            SetAutostart(tsmiAutostart.Checked);
+            string key_name = "Clock_P_421";
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            if (tsmiAutostart.Checked) rk.SetValue(key_name, Application.ExecutablePath);
+            else rk.DeleteValue(key_name, false);
+            rk.Dispose();
         }
 
         private void SetAutostart(bool enable)
@@ -225,7 +229,8 @@ namespace Clock
         }
         private void tsmiFont_Click(object sender, EventArgs e)
         {
-            if
+            if(fontDialog.ShowDialog() == DialogResult.OK)
+                labelTime.Text = fontDialog.Text;
         }
     }
 }
