@@ -18,6 +18,7 @@ namespace Clock
         MainForm parent;
         Dictionary<string, string> d_fonts; //Словарь (Дерево) - это структура данныхб которая хранит множество пар <Ключ - Значение> <Key - Value>
         public new Font Font {  get; set; } //Объявляем Автосвойства 'Font', типа 'Font'; 2 Font свойство
+        public string FontFile { get; set; }
         public FontDialog()
         {
             InitializeComponent();
@@ -87,6 +88,7 @@ namespace Clock
         {
             this.Font = labelExample.Font;
             this.DialogResult = DialogResult.OK;
+            FontFile = d_fonts[comboBoxFonts.SelectedItem.ToString()];
             this.Close();
         }
     }
